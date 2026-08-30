@@ -12,7 +12,7 @@ Our mission is to translate neuroplasticity research into dynamic, real-time sof
 * **Computational Neuroscience:** Mapping learning tracks to adaptive cognitive models.
 * **Neurodivergent Accessibility:** Tailoring environments for ADHD, autism, and dyslexia.
 * **Serverless Architecture:** Building lightweight, event-driven AI infrastructure.
-* **Gamified Pedagogy:** Blending core academics with social-emotional milestone tracking.
+* **Gamified Learning:** Blending core academics with social-emotional milestone tracking.
 
 ---
 
