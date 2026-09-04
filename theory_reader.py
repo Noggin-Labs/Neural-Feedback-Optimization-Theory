@@ -1,4 +1,3 @@
-!pip install pypdf
 from pypdf import PdfReader
 
 # Extract text to understand the Neural Feedback Optimization Theory
