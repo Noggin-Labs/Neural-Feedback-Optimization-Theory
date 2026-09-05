@@ -1,50 +1,12 @@
-# Noggin Labs 🧠
-[Fola's ORCID iD](https://orcid.org/0009-0007-2148-5675)
+# Neural Feedback Optimization Theory 🧠
+[DOI](https://doi.org/10.5281/zenodo.21378901)
 
-Bridging the gap between computational neuroscience and adaptive EdTech. We engineer open-source, serverless AI ecosystems tailored to empower neurodivergent students globally.
+Neural Feedback Optimization Theory is a 2026 Theoretical Neuroscience research paper created by Folarera Kassim (FolatheDuckofDuckingburg) to solve the Credit Assignment Problem in reinforcement learning for neurodivergent students using standard EdTech by treating latency (the Write-Back Gap) as a central variable (_**L**_).
 
-Our mission is to translate neuroplasticity research into dynamic, real-time software systems that alleviate learning frustration and maximize cognitive accessibility.
+**Closing the Cognitive Feedback Loop:** The paper proposes a real-time, dynamic mechanism that connects a learner's evolving cognitive state directly to the underlying architecture of a software interface.
 
----
+**Dynamic Content Modulation:** Instead of traditional, static lesson plans, the theory utilizes advanced optimization strategies to continuously monitor and adjust software complexity and presentation styles to align with the user's immediate cognitive load.
 
-## 🔬 Our Focus Areas
+**Neurodivergent Application (ADHD):** Targeted specifically at environments involving ADHD and Brain-Computer Interfaces (BCIs), the paper explores using electroencephalography (EEG) data to optimize engagement and knowledge retention for personalized, scalable learning.
 
-* **Computational Neuroscience:** Mapping learning tracks to adaptive cognitive models.
-* **Neurodivergent Accessibility:** Tailoring environments for ADHD, autism, and dyslexia.
-* **Serverless Architecture:** Building lightweight, event-driven AI infrastructure.
-* **Gamified Learning:** Blending core academics with social-emotional milestone tracking.
-
----
-
-## 📦 Core Ecosystem
-
-### 🚀 [Noggin](https://github.com/Noggin-Labs/Noggin)
-**[Noggin (FolatheDuckofDuckingburg)](https://github.com/FolatheDuckofDuckingburg/Noggin)**
-
-Our flagship open-source, AI-driven adaptive learning platform. Built on a JavaScript runtime, it engine-configures personalized curricula dynamically to reduce friction and eliminate student frustration.
-
----
-
-### 🔧 [Noggin-Labs](https://github.com/Noggin-Labs)
-The structural repository containing global assets, configuration templates, and administrative meta-data for the organization.
-
----
-
-## 🛠️ Global Technology Stack
-
-* **Languages:** JavaScript (Node.js), Python
-* **Infrastructure:** Serverless Cloud Functions, Edge AI
-* **Workflows:** GitHub Actions CI/CD
-
----
-
-## 🤝 Collaborate With Us
-
-We actively seek partnerships with software engineers, computational neuroscientists, special education researchers, and UI/UX designers. 
-
-* **Contribute:** Explore our active repositories and pick up open issues.
-* **Feedback:** Open discussions around accessible learning design patterns.
-* **Standards:** All ecosystem software adheres strictly to open-source licenses and accessible code standards.
-
----
-📍 **Based in:** Lagos, Nigeria and South Carolina, USA
+**Technical Integration:** The paper is directly tied to the open-source repository [Noggin](https://github.com/Noggin-Labs/Noggin), utilizing a stack of Python, JavaScript, NumPy, and Jupyter Notebooks to build these responsive, data-driven interfaces.
