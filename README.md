@@ -10,7 +10,7 @@
 
 ### 🔑 Core Theoretical Pillars
 
-*   **Closed-Loop Cognitive Modulation:** Establishes a real-time, bi-directional feedback mechanism that directly binds a learner's shifting neurodynamic states to the execution architecture of client-side software interfaces.
+*   **Closed-Loop Cognitive Modulation:** Establishes a real-time, bidirectional feedback mechanism that directly binds a learner's shifting neurodynamic states to the execution architecture of client-side software interfaces.
 *   **Dynamic Content Scaffolding:** Replaces static pedagogical structures with localized optimization algorithms that continuously modulate interface complexity, task pacing, and presentation latency to map precisely onto the user's immediate cognitive load.
 *   **Neurodivergent Telemetry (ADHD/BCI):** Engineered specifically for Human-in-the-Loop Brain-Computer Interfaces. The framework leverages electroencephalography (EEG) data to optimize knowledge retention thresholds and stabilize attentional engagement curves for neurodivergent individuals.
 
@@ -25,4 +25,3 @@
 
 ### 🚀 Downstream Integration
 The theoretical mathematical models developed in this repository are natively implemented within the open-source client-side interface ecosystem at **[Noggin Labs](https://github.com/Noggin-Labs)**.
-Use code with caution.
