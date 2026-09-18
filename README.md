@@ -16,12 +16,6 @@
 
 ---
 
-### 📂 Repository Architecture
-*   `/.github/workflows/`: Automated CI/CD pipelines handling code syntax validation and regression tests.
-*   `/NFOT`: Dedicated mathematical models computing the Lorentzian learning efficiency curve and simulating threshold variances.
-*   `theory_reader.py`: Python entry point for script execution and neural data analysis.
-
----
 
 ### 🚀 Downstream Integration
 The theoretical mathematical models developed in this repository are natively implemented within the open-source client-side interface ecosystem at **[Noggin Labs](https://github.com/Noggin-Labs)**.
