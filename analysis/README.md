@@ -31,3 +31,23 @@ The output is one row per selection.
 ```
 python pool.py /path/to/csv/folder
 ```
+Then run:
+```
+python analyze.py pooled_trials.csv
+```
+Note on the target channel
+The PhysioNet documentation for bigP3BCI states that the target character
+is stored in ```CurrentTarget```. In Study M (adaptive diffuse paradigm),
+```CurrentTarget``` is empty (all zeros) throughout the file. The target
+character index is actually stored in ``StimulusType``. This analysis uses
+```StimulusType```.
+
+## Status
+Ongoing. The dataset survey in NFOT v3 identified that most public BCI
+datasets do not preserve trial-level selection timing. bigP3BCI does,
+once the target-channel labeling is corrected.
+
+## Requirements
+Python 3.10+
+``numpy``, ``pandas``, ``scipy``, ``scikit-learn``.
+
