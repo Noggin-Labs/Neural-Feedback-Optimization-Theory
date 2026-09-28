@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use this code or data, please cite the NFOT preprint."
+authors:
+  - family-names: Kassim
+    given-names: Folarera
+    orcid: "https://orcid.org/0009-0007-2148-5675"
+title: "NFOT: Trial-Level Analysis of bigP3BCI"
+version: 0.1.0
+date-released: 2026-09-28
+url: "https://github.com/Noggin-Labs/Neural-Feedback-Optimization-Theory"
