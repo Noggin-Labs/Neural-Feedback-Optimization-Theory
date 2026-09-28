@@ -1,0 +1,16 @@
+# Data files (large, regenerable)
+*.csv
+!pooled_trials.csv
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
