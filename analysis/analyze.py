@@ -1,156 +1,261 @@
+
+#!/usr/bin/env python3
 """
-analyze.py
+NFOT exploratory analysis with leakage and data-integrity safeguards.
 
-Basic statistical analysis of pooled (L, Y) trials.
+Expected CSV columns:
+    participant_id : participant identifier
+    recording_id   : recording/session identifier
+    L              : Write-Back Gap in seconds
+    Y              : binary outcome (0 or 1)
+    trial          : optional trial-order column
 
-Analyses performed:
-    1. Descriptive: means of L for correct vs incorrect trials.
-    2. Logistic regression: does L predict Y?
-    3. Distributional test: does adding variance/tail information improve
-       prediction beyond the mean?
-
-Usage:
-    python analyze.py [pooled_trials.csv]
-
-Requires: pandas, numpy, scipy, scikit-learn
+IMPORTANT:
+- This script does not establish that the source labels are correct.
+- Verify target reconstruction and event timestamps before analysis.
+- Results are exploratory, not causal evidence.
 """
 
+from __future__ import annotations
+
+import argparse
+import json
 import sys
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
-from scipy import stats
+from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_auc_score
+from sklearn.model_selection import GroupKFold
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
 
 
-def load_data(path='pooled_trials.csv'):
+REQUIRED = {"participant_id", "recording_id", "L", "Y"}
+
+
+def load_data(path: Path) -> pd.DataFrame:
     df = pd.read_csv(path)
-    required = ['L', 'Y']
-    missing = [c for c in required if c not in df.columns]
+
+    missing = REQUIRED - set(df.columns)
     if missing:
-        raise ValueError(f"Missing columns in {path}: {missing}")
-    return df
+        raise ValueError(
+            f"Missing required columns: {sorted(missing)}. "
+            "Map the real dataset schema explicitly; do not guess."
+        )
+
+    df = df.copy()
+    df["L"] = pd.to_numeric(df["L"], errors="coerce")
+    df["Y"] = pd.to_numeric(df["Y"], errors="coerce")
+
+    if df[["participant_id", "recording_id"]].isna().any().any():
+        raise ValueError("Participant and recording IDs cannot be missing.")
+
+    if df[["L", "Y"]].isna().any().any():
+        raise ValueError(
+            "L or Y contains missing/non-numeric values. "
+            "Investigate them before deciding how to handle them."
+        )
+
+    if not np.isfinite(df["L"]).all():
+        raise ValueError("L contains infinite values.")
+
+    if (df["L"] < 0).any():
+        raise ValueError("Negative L values found; audit timestamps.")
+
+    if not set(df["Y"].unique()).issubset({0, 1}):
+        raise ValueError("Y must contain only verified binary labels 0 and 1.")
+
+    if df["Y"].nunique() != 2:
+        raise ValueError("Both outcome classes are required.")
+
+    # Never silently treat file order as chronological order when a
+    # trial-order column is available.
+    if "trial" not in df.columns:
+        raise ValueError(
+            "Missing trial-order column. Add a verified chronological "
+            "'trial' column before computing rolling features."
+        )
+
+    df["trial"] = pd.to_numeric(df["trial"], errors="raise")
+
+    if df.duplicated(["recording_id", "trial"]).any():
+        raise ValueError(
+            "Duplicate recording_id/trial pairs found. "
+            "Resolve duplicate or ambiguous trial ordering."
+        )
+
+    return df.sort_values(
+        ["recording_id", "trial"], kind="stable"
+    ).reset_index(drop=True)
 
 
-def descriptive(df):
-    print("=" * 60)
-    print("DESCRIPTIVE STATISTICS")
-    print("=" * 60)
-    print(f"Total trials: {len(df)}")
-    print(f"Correct (Y=1): {(df['Y'] == 1).sum()}")
-    print(f"Incorrect (Y=0): {(df['Y'] == 0).sum()}")
-    print()
+def add_past_only_variance(
+    df: pd.DataFrame, window: int = 5, min_periods: int = 2
+) -> pd.DataFrame:
+    """Variance of earlier L values in the same recording only."""
+    if window < 2:
+        raise ValueError("window must be at least 2.")
+    if min_periods < 2 or min_periods > window:
+        raise ValueError("min_periods must be between 2 and window.")
 
-    correct_L = df.loc[df['Y'] == 1, 'L']
-    incorrect_L = df.loc[df['Y'] == 0, 'L']
-
-    print(f"L | Y=1: mean={correct_L.mean():.3f}, std={correct_L.std():.3f}")
-    print(f"L | Y=0: mean={incorrect_L.mean():.3f}, std={incorrect_L.std():.3f}")
-    print()
-
-    if len(correct_L) > 1 and len(incorrect_L) > 1:
-        t_stat, p_val = stats.ttest_ind(correct_L, incorrect_L, equal_var=False)
-        print(f"Welch t-test: t={t_stat:.3f}, p={p_val:.4f}")
-    else:
-        print("Not enough data in each class for a t-test.")
-    print()
+    result = df.copy()
+    result["L_prior_var"] = (
+        result.groupby("recording_id", sort=False)["L"]
+        .transform(
+            lambda s: s.shift(1).rolling(
+                window=window, min_periods=min_periods
+            ).var()
+        )
+    )
+    return result
 
 
-def logistic_regression(df):
-    print("=" * 60)
-    print("LOGISTIC REGRESSION: Y ~ L")
-    print("=" * 60)
+def within_participant_center(
+    df: pd.DataFrame, column: str
+) -> pd.Series:
+    """Center a feature around each participant's observed mean."""
+    return df[column] - df.groupby("participant_id")[column].transform("mean")
 
-    if df['Y'].nunique() < 2:
-        print("Y has only one class. Cannot fit regression.")
-        print()
-        return
 
-    X = df[['L']].values
-    y = df['Y'].values
+def grouped_auc(
+    X: pd.DataFrame, y: pd.Series, groups: pd.Series
+) -> dict:
+    """Out-of-participant predictions; report pooled AUC and fold coverage."""
+    n_groups = groups.nunique()
+    if n_groups < 3:
+        raise ValueError(
+            "At least 3 distinct participants are required for grouped CV."
+        )
 
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.3, random_state=42
+    splitter = GroupKFold(n_splits=min(5, n_groups))
+    predictions = np.full(len(y), np.nan)
+    fold_results = []
+
+    for train_idx, test_idx in splitter.split(X, y, groups):
+        y_train = y.iloc[train_idx]
+        y_test = y.iloc[test_idx]
+
+        if y_train.nunique() != 2:
+            fold_results.append({"status": "skipped", "reason": "one training class"})
+            continue
+
+        if y_test.nunique() != 2:
+            fold_results.append({"status": "skipped", "reason": "one test class"})
+            continue
+
+        model = make_pipeline(
+            SimpleImputer(strategy="median"),
+            StandardScaler(),
+            LogisticRegression(max_iter=2000, random_state=0),
+        )
+        model.fit(X.iloc[train_idx], y_train)
+        predictions[test_idx] = model.predict_proba(X.iloc[test_idx])[:, 1]
+
+        fold_results.append({
+            "status": "evaluated",
+            "test_participants": int(groups.iloc[test_idx].nunique()),
+            "test_trials": int(len(test_idx)),
+            "auc": float(
+                roc_auc_score(y_test, predictions[test_idx])
+            ),
+        })
+
+    valid = np.isfinite(predictions)
+    if valid.sum() == 0 or y.iloc[np.flatnonzero(valid)].nunique() != 2:
+        raise ValueError(
+            "No valid pooled AUC could be calculated. "
+            "Inspect class balance and participant-level fold composition."
+        )
+
+    return {
+        "pooled_auc": float(
+            roc_auc_score(y.iloc[np.flatnonzero(valid)], predictions[valid])
+        ),
+        "evaluated_trials": int(valid.sum()),
+        "total_trials": int(len(y)),
+        "folds": fold_results,
+    }
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("csv", type=Path, help="Verified analysis CSV")
+    parser.add_argument(
+        "--labels-verified",
+        action="store_true",
+        help="Confirm that Y is a correctly reconstructed outcome label",
+    )
+    parser.add_argument(
+        "--output", type=Path, default=Path("nfot_analysis_report.json")
+    )
+    args = parser.parse_args()
+
+    if not args.labels_verified:
+        parser.error(
+            "Refusing to analyze unverified labels. Audit target/event "
+            "reconstruction, then pass --labels-verified."
+        )
+
+    df = add_past_only_variance(load_data(args.csv))
+
+    # Use the identical complete-case sample and identical folds for both
+    # models. No missing rolling variance is filled using future trials.
+    sample = df.dropna(subset=["L_prior_var"]).copy().reset_index(drop=True)
+
+    if sample.empty:
+        raise ValueError("No rows have enough prior trials for rolling variance.")
+
+    sample["L_within"] = within_participant_center(sample, "L")
+    sample["L_prior_var_within"] = within_participant_center(
+        sample, "L_prior_var"
     )
 
-    model = LogisticRegression()
-    model.fit(X_train, y_train)
+    X_base = sample[["L_within"]]
+    X_augmented = sample[["L_within", "L_prior_var_within"]]
+    y = sample["Y"]
+    groups = sample["participant_id"]
 
-    coef = model.coef_[0][0]
-    intercept = model.intercept_[0]
+    # Both models use the same sample and deterministic grouped-fold rule.
+    baseline = grouped_auc(X_base, y, groups)
+    augmented = grouped_auc(X_augmented, y, groups)
 
-    print(f"Beta coefficient: {coef:.4f}")
-    print(f"Intercept: {intercept:.4f}")
-    print(f"Interpretation: odds ratio per 1s change in L = {np.exp(coef):.4f}")
+    report = {
+        "status": "exploratory",
+        "causal_claim": False,
+        "n_trials": int(len(sample)),
+        "n_participants": int(groups.nunique()),
+        "n_recordings": int(sample["recording_id"].nunique()),
+        "outcome_accuracy": float(y.mean()),
+        "rolling_feature": (
+            "sample variance of up to five prior L values, "
+            "within the same recording"
+        ),
+        "baseline_model": ["L_within"],
+        "augmented_model": ["L_within", "L_prior_var_within"],
+        "baseline": baseline,
+        "augmented": augmented,
+        "auc_difference": float(
+            augmented["pooled_auc"] - baseline["pooled_auc"]
+        ),
+        "interpretation_warning": (
+            "AUC differences alone do not establish statistical significance, "
+            "causality, or generalization beyond this dataset. Use paired "
+            "participant-level uncertainty estimates for formal comparisons."
+        ),
+    }
 
-    if len(np.unique(y_test)) > 1:
-        y_prob = model.predict_proba(X_test)[:, 1]
-        auc = roc_auc_score(y_test, y_prob)
-        print(f"Out-of-sample ROC-AUC: {auc:.4f}")
-        if auc > 0.55:
-            print("Result: L may carry predictive information.")
-        else:
-            print("Result: L does not significantly improve prediction here.")
-    else:
-        print("Test set has only one class. AUC not computable.")
-    print()
-
-
-def distributional_test(df):
-    print("=" * 60)
-    print("DISTRIBUTIONAL PREDICTION TEST")
-    print("=" * 60)
-    print("(This is the NFOT-specific prediction.)")
-    print()
-
-    # Sort trials by file and trial order so that "previous trial L" is meaningful.
-    df = df.sort_values(['file', 'trial']).reset_index(drop=True)
-
-    # Rolling variance of L over the previous 5 trials
-    df['L_rolling_var'] = df['L'].rolling(window=5, min_periods=2).var()
-
-    # Drop rows where rolling variance is undefined
-    sub = df.dropna(subset=['L_rolling_var'])
-
-    if len(sub) < 20:
-        print(f"Not enough trials with rolling variance ({len(sub)}).")
-        print("Pool more files before testing the distributional prediction.")
-        print()
-        return
-
-    if sub['Y'].nunique() < 2:
-        print("Y has only one class. Cannot test.")
-        print()
-        return
-
-    X = sub[['L', 'L_rolling_var']].values
-    y = sub['Y'].values
-
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.3, random_state=42
-    )
-
-    model = LogisticRegression()
-    model.fit(X_train, y_train)
-    y_prob = model.predict_proba(X_test)[:, 1]
-
-    if len(np.unique(y_test)) > 1:
-        auc = roc_auc_score(y_test, y_prob)
-        print(f"Out-of-sample AUC (L + rolling variance): {auc:.4f}")
-        print()
-        print("Compare to the AUC from Y ~ L alone.")
-        print("If the distributional version is not higher, the distributional")
-        print("prediction is not supported by this data.")
-    else:
-        print("Test set has only one class.")
-    print()
+    args.output.write_text(json.dumps(report, indent=2) + "\n")
+    print(json.dumps(report, indent=2))
+    print(f"\nSaved report to: {args.output}")
+    return 0
 
 
-if __name__ == '__main__':
-    path = sys.argv[1] if len(sys.argv) > 1 else 'pooled_trials.csv'
-    df = load_data(path)
-
-    descriptive(df)
-    logistic_regression(df)
-    distributional_test(df)
+if __name__ == "__main__":
+    try:
+        raise SystemExit(main())
+    except (ValueError, OSError) as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        raise SystemExit(2)
