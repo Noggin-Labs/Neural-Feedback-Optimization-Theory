@@ -22,6 +22,21 @@ Note on the target channel:
     'StimulusType'. This function uses StimulusType.
 """
 
+"""
+LEGACY EXTRACTOR SAFETY GATE
+
+The legacy event and target mappings require verification against the
+official dataset documentation and the actual Study M recordings.
+
+Do not generate analysis-ready labels until those mappings are validated.
+"""
+
+raise RuntimeError(
+    "Legacy NFOT extraction halted: event/target mappings have not been "
+    "verified. Preserve this script for reference. Use a separately "
+    "validated extraction pipeline before producing analysis-ready data."
+)
+
 import os
 import pandas as pd
 import numpy as np
