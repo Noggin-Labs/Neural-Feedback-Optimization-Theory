@@ -33,7 +33,7 @@ A related experimental question is whether controlled changes in feedback timing
 The operational definition used in the historical analysis is:
 
 - **$t_0$:** The `StimulusBegin` event, representing stimulus onset in the event stream.
-- **$t_{\mathrm{fb}}$:** The rising edge of `DisplayResults`, representing the feedback-display event in the event stream.
+- **$t_{\mathrm{fb}}$:** The rising edge of the documented `DisplayResult` feedback-display event in the event stream. Some legacy exports use the plural alias `DisplayResults`; this must be resolved explicitly.
 - **$L$:** The elapsed interval between these two events.
 
 The interval is a trial-level event-to-feedback measure. It should not automatically be interpreted as neural processing time, pure system latency, or a direct measurement of biological feedback processing.
@@ -49,7 +49,7 @@ The observational analysis used **bigP3BCI Study M data from PhysioNet**.
 The analysis pipeline used VampireBCI to extract relevant event markers, including:
 
 - `StimulusBegin`
-- `DisplayResults`
+- `DisplayResult` (legacy exports may use `DisplayResults`)
 - `CurrentTarget`
 - `SelectedTarget`
 

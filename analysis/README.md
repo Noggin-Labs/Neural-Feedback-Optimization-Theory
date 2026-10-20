@@ -35,12 +35,17 @@ Then run:
 ```
 python analyze.py pooled_trials.csv
 ```
-Note on the target channel
-The PhysioNet documentation for bigP3BCI states that the target character
-is stored in ```CurrentTarget```. In Study M (adaptive diffuse paradigm),
-```CurrentTarget``` is empty (all zeros) throughout the file. The target
-character index is actually stored in ``StimulusType``. This analysis uses
-```StimulusType```.
+## Target-channel status
+
+The official bigP3BCI documentation identifies `CurrentTarget` as the target
+character channel and `StimulusType` as a binary target/non-target stimulus
+indicator. The repository contains a historical Study M claim that
+`CurrentTarget` was all zero and that `StimulusType` could be used as a
+character index, but the raw EDFs and complete converted event streams needed
+to resolve that discrepancy are not present. v6 therefore does **not** accept
+`StimulusType` as a character label. Use `analysis/extract.py` only after
+auditing the source export, confirming the time unit, and passing
+`--confirm-studyM-export` explicitly.
 
 ## Status
 Ongoing. The dataset survey in NFOT v3 identified that most public BCI
@@ -50,4 +55,3 @@ once the target-channel labeling is corrected.
 ## Requirements
 Python 3.10+
 ``numpy``, ``pandas``, ``scipy``, ``scikit-learn``.
-
