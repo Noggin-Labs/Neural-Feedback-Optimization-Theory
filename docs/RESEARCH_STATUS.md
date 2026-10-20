@@ -2,7 +2,7 @@
 
 **Project:** Neural Feedback Optimization Theory (NFOT)
 
-**Status:** Observational analysis completed; prospective causal validation remains outstanding.
+**Status:** v7 validation programme drafted; source-level reconstruction and prospective causal validation remain outstanding.
 
 ## 1. Research Question
 
@@ -71,6 +71,14 @@ Preserve the raw data, scripts, environment requirements, and analysis outputs. 
 
 Do not describe the prospective experiment as completed, preregistered, or approved until those milestones have actually occurred.
 
-## 8. Summary
+## 8. NFOT v7 status
+
+The v7 audit verified the live repository state and found that the previous v6 pull request remains open rather than merged. The current branch preserves the v5 and v6 record and adds a source-data audit, hostile evidence ledger, formal competing models, synthetic planning tool, falsification matrix, novelty/mechanism/application reviews, and preregistration-ready protocol materials.
+
+The strongest defensible contribution is currently a reproducible measurement-and-validation framework for asking whether event-defined feedback timing adds value beyond conventional latency measures. The project does not currently demonstrate a new biological mechanism, a causal effect, independent source-level reproduction, or a breakthrough.
+
+Source-level validation is blocked by missing raw EDFs or complete trusted event streams, converter metadata, and an inclusion/exclusion manifest. The single highest-value next action is recovery of those materials and resolution of the `CurrentTarget`/`StimulusType` discrepancy.
+
+## 9. Summary
 
 NFOT currently has a reported observational result and a software timing prototype. Prospective causal testing, physical timing validation where needed, and independent replication remain important steps toward determining the theory's scope and validity.

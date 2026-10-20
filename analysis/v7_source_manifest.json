@@ -1,0 +1,24 @@
+{
+  "status": "blocked_source_level_validation",
+  "repository_commit": "a2d88e922e19fd087dd0c2e0892684085d0fd9a8",
+  "source_files_available": false,
+  "raw_edf_available": false,
+  "complete_event_stream_available": false,
+  "converter_metadata_available": false,
+  "derived_table_rows": 444,
+  "derived_table_sha256": "2b030f2cec7a6d357b21b81cf050d02f6d2556a3aa55bd29a0876cfdf5074105",
+  "empty_source_placeholders": [
+    "analysis/csv/M_04_SE001_ADdiff_Test01.csv",
+    "analysis/csv/M_04_SE001_ADdiff_Test02.csv"
+  ],
+  "included_source_rows": null,
+  "excluded_source_rows": null,
+  "exclusion_reasons": [],
+  "blocking_reason": "Raw EDFs or complete trusted event streams and converter provenance are absent; no honest source-level inclusion/exclusion manifest can be generated.",
+  "required_next_inputs": [
+    "Study M raw EDF recordings or complete trusted event-stream exports",
+    "Converter version and settings",
+    "Authoritative target-channel mapping",
+    "Source-level file/participant inclusion manifest"
+  ]
+}

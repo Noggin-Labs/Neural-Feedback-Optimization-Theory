@@ -2,11 +2,15 @@
 
 ### The Write-Back Gap as a Trial-Level Temporal Variable in Closed-Loop Learning Systems
 
-**Version:** 5  
-**Status:** Observational analysis completed; prospective causal validation remains outstanding  
+**Version:** 7 draft
+**Status:** Validation programme drafted; source-level reconstruction and prospective causal validation remain outstanding
 **Research areas:** Computational neuroscience · Brain–computer interfaces · Closed-loop learning systems · Temporal dynamics
 
 [**Read the NFOT v5 preprint on Zenodo**](https://zenodo.org/records/23140358)
+
+> **Current v7 evidence status:** The repository's 444-row derived table is internally arithmetically consistent, but raw EDF recordings or complete trusted event streams, converter metadata, and the source-level inclusion manifest are unavailable. Historical inferential claims are therefore reported but not independently reproduced. NFOT is a testable research programme, not a demonstrated breakthrough.
+
+The v7 branch and documents distinguish historical v5 artifacts, the v6 audit, exploratory analyses, proposed confirmatory analyses, and future experiments. Run the tests with `python3 -m unittest discover -s tests -p 'test_*.py' -v`. Source extraction must stop unless event semantics, timestamp units, and target labels are verified.
 
 ---
 
@@ -65,7 +69,7 @@ The NFOT v5 analysis included:
 
 The primary outcome was trial-level BCI target-selection accuracy.
 
-### Reported Results
+### Historical v5 Reported Results
 
 The v5 analysis reported the following results:
 
@@ -83,7 +87,7 @@ The v5 analysis reported the following results:
 | AUC difference | +0.076 |
 | Reported 95% CI for AUC difference | [0.021, 0.131] |
 
-These figures describe the reported analysis and should be interpreted in the context of its model specifications, uncertainty estimates, and observational design.
+These figures are historical reported results. The v6/v7 audits reproduce only descriptive arithmetic from the supplied derived table; they do not independently reproduce the source extraction or inferential outputs. Interpret the values in the context of their model specifications, uncertainty estimates, and observational design.
 
 The leave-one-subject-out result indicates that the estimated association's direction was consistent across the reported folds. It does not establish causation or guarantee generalization to independent datasets.
 
@@ -162,6 +166,10 @@ The current evidence has important limitations:
 - Prospective manipulation and independent replication are still needed.
 
 These limitations define the next research steps; they do not make the question unworthy of investigation.
+
+## NFOT v7 documents
+
+The v7 audit and planning set is in `docs/`: `V7_BASELINE_AND_SCOPE.md`, `V7_SOURCE_DATA_AUDIT.md`, `V7_EVIDENCE_LEDGER.md`, `V7_STATISTICAL_ANALYSIS_PLAN.md`, `V7_FORMAL_MODEL.md`, `V7_PROSPECTIVE_PROTOCOL.md`, `V7_PREREGISTRATION_DRAFT.md`, `V7_FALSIFICATION_MATRIX.md`, `V7_BENCHMARK_REPORT.md`, `V7_LITERATURE_REVIEW.md`, `V7_NOVELTY_AND_POSITIONING.md`, `V7_NEUROSCIENCE_MECHANISM_REVIEW.md`, `V7_APPLICATIONS_AND_TRANSLATION.md`, `V7_BREAKTHROUGH_READINESS.md`, and `V7_FINAL_MISSION_REPORT.md`. The manuscript draft is in `manuscript/NFOT_v7_manuscript.md`. Source-level validation remains blocked until the required recordings or trusted event streams are recovered.
 
 ## Research Status
 
