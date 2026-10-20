@@ -25,12 +25,6 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from sklearn.impute import SimpleImputer
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import roc_auc_score
-from sklearn.model_selection import GroupKFold
-from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import StandardScaler
 
 
 REQUIRED = {"participant_id", "recording_id", "L", "Y"}
@@ -124,6 +118,19 @@ def grouped_auc(
     X: pd.DataFrame, y: pd.Series, groups: pd.Series
 ) -> dict:
     """Out-of-participant predictions; report pooled AUC and fold coverage."""
+    try:
+        from sklearn.impute import SimpleImputer
+        from sklearn.linear_model import LogisticRegression
+        from sklearn.metrics import roc_auc_score
+        from sklearn.model_selection import GroupKFold
+        from sklearn.pipeline import make_pipeline
+        from sklearn.preprocessing import StandardScaler
+    except ImportError as exc:
+        raise RuntimeError(
+            "grouped_auc requires scikit-learn; install project requirements "
+            "before running predictive analysis"
+        ) from exc
+
     n_groups = groups.nunique()
     if n_groups < 3:
         raise ValueError(
