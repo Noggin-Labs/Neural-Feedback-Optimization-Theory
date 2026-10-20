@@ -34,7 +34,7 @@ Executed commands included `python3 -m unittest discover -s tests -p 'test_*.py'
 
 ## I. Repository status
 
-Branch: `nfot-v7-validation`. Baseline commit: `a2d88e922e19fd087dd0c2e0892684085d0fd9a8`. At the time of v7 baseline inspection, the working tree was clean, PR #1 was open, `origin/main` was `88045e3`, and no release existed. V7 changes are local and have not been pushed or merged.
+Branch: `nfot-v7-validation`. V7 commit: `c0d8e5fd997a5c70b2765ebb5d46048c5a97c338`. At the time of v7 baseline inspection, the working tree was clean, PR #1 was open, `origin/main` was `88045e3`, and no release existed. The v7 branch was subsequently pushed and verified at `origin/nfot-v7-validation`; no v7 pull request was opened because PR #1 remains open and a direct v7-to-main PR would duplicate the unmerged v6 audit history.
 
 ## J. Breakthrough-readiness assessment
 
