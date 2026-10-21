@@ -6,6 +6,7 @@ import pandas as pd
 
 from analysis.analyze_trials import AnalysisError, read_trials, run_analysis
 from analysis.extract import ExtractionConfig, ExtractionError, extract_trials_from_frame
+from analysis.v7_power_simulation import simulate
 
 
 class V6ValidationTests(unittest.TestCase):
@@ -88,6 +89,28 @@ class V6ValidationTests(unittest.TestCase):
         frame["DisplayResult"] = 0
         with self.assertRaises(ExtractionError):
             extract_trials_from_frame(frame, ExtractionConfig(), "x.csv")
+
+    def test_synthetic_power_simulation_is_deterministic(self):
+        kwargs = dict(
+            n_participants=6,
+            trials_per_condition=8,
+            baseline_probability=0.7,
+            absolute_effect=0.1,
+            repetitions=20,
+            seed=123,
+        )
+        self.assertEqual(simulate(**kwargs), simulate(**kwargs))
+
+    def test_synthetic_power_simulation_rejects_invalid_probability(self):
+        with self.assertRaises(ValueError):
+            simulate(
+                n_participants=6,
+                trials_per_condition=8,
+                baseline_probability=0.99,
+                absolute_effect=0.1,
+                repetitions=20,
+                seed=123,
+            )
 
 
 if __name__ == "__main__":
