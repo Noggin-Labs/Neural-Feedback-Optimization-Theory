@@ -1,0 +1,27 @@
+name: Lean formal verification
+
+on:
+  push:
+    paths:
+      - 'formal/NFOT/**'
+      - '.github/workflows/lean.yml'
+  pull_request:
+    paths:
+      - 'formal/NFOT/**'
+      - '.github/workflows/lean.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build NFOT Lean library
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Lean and build
+        uses: leanprover/lean-action@v1
+        with:
+          lake-package-directory: formal/NFOT
+          use-mathlib-cache: true
+          build: true
