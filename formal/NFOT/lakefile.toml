@@ -1,0 +1,11 @@
+name = "nfot"
+version = "0.1.0"
+defaultTargets = ["NFOT"]
+
+[[lean_lib]]
+name = "NFOT"
+
+[[require]]
+name = "mathlib"
+git = "https://github.com/leanprover-community/mathlib4"
+rev = "v4.19.0"
