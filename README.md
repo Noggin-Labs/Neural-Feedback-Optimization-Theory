@@ -2,202 +2,82 @@
 
 ### The Write-Back Gap as a Trial-Level Temporal Variable in Closed-Loop Learning Systems
 
-**Version:** 7 draft
-**Status:** Validation programme drafted; source-level reconstruction and prospective causal validation remain outstanding
-**Research areas:** Computational neuroscience · Brain–computer interfaces · Closed-loop learning systems · Temporal dynamics
+**Current working manuscript:** NFOT v6  
+**Research areas:** Computational neuroscience · Brain–computer interfaces · Closed-loop learning systems · Temporal dynamics  
+**Repository:** Noggin Labs
 
-[**Read the NFOT v5 preprint on Zenodo**](https://zenodo.org/records/23140358)
+NFOT investigates whether the timing and distribution of feedback in closed-loop systems contain trial-level information about system performance that is obscured by aggregate latency measures.
 
-> **Current v7 evidence status:** The repository's 444-row derived table is internally arithmetically consistent, but raw EDF recordings or complete trusted event streams, converter metadata, and the source-level inclusion manifest are unavailable. Historical inferential claims are therefore reported but not independently reproduced. NFOT is a testable research programme, not a demonstrated breakthrough.
+The central construct is the **Write-Back Gap**, defined for the historical analysis as:
 
-The v7 branch and documents distinguish historical v5 artifacts, the v6 audit, exploratory analyses, proposed confirmatory analyses, and future experiments. Run the tests with `python3 -m unittest discover -s tests -p 'test_*.py' -v`. Source extraction must stop unless event semantics, timestamp units, and target labels are verified.
+\[
+L = t_{\mathrm{fb}} - t_0
+\]
 
----
+where \(t_0\) is the defined stimulus-onset event and \(t_{\mathrm{fb}}\) is the rising edge of the corresponding feedback-display event. This is an operational event-to-feedback interval; it should not automatically be interpreted as neural processing time or a direct biological measurement.
 
-## Overview
-
-Neural Feedback Optimization Theory (NFOT) investigates whether the timing of feedback in a closed-loop system contains meaningful trial-level information about system performance that may be obscured by aggregate latency measures.
-
-The central construct is the **Write-Back Gap**, \(L\): the elapsed time between a defined starting event and the completion of the corresponding feedback event.
-
-$L=t_{\text{fb}}-t_0$
-
-NFOT proposes that the distribution of this interval—including its variability and tail behavior—may provide information about performance beyond its mean alone.
-
-The current research evaluates this proposal using historical brain–computer interface (BCI) data. The results motivate further investigation but do not establish that the Write-Back Gap causally determines performance.
-
-## Research Question
+## Research question
 
 **Does the trial-level Write-Back Gap, including its distributional characteristics, contain information about BCI performance beyond what is captured by its mean?**
 
-A related experimental question is whether controlled changes in feedback timing produce measurable changes in performance. This requires prospective intervention rather than observational analysis alone.
+A related prospective question is whether controlled changes in feedback timing produce measurable changes in performance. That requires prospective intervention and measurement validation.
 
-## The Write-Back Gap
+## Evidence status
 
-The operational definition used in the historical analysis is:
+The repository contains historical analyses, a v6 manuscript draft, provenance and validation documentation, a timing prototype, and a prospective experimental planning track.
 
-- **$t_0$:** The `StimulusBegin` event, representing stimulus onset in the event stream.
-- **$t_{\mathrm{fb}}$:** The rising edge of the documented `DisplayResult` feedback-display event in the event stream. Some legacy exports use the plural alias `DisplayResults`; this must be resolved explicitly.
-- **$L$:** The elapsed interval between these two events.
+Important distinctions:
 
-The interval is a trial-level event-to-feedback measure. It should not automatically be interpreted as neural processing time, pure system latency, or a direct measurement of biological feedback processing.
+- Historical v5 statistics are **reported historical results**, not independently reproduced inferential findings.
+- The v6 source-level provenance audit remains a separate validation task.
+- Raw EDF recordings or complete trusted event streams, converter metadata, and the source-level inclusion manifest must be available before source extraction can be independently reconstructed.
+- The timing prototype supports instrumentation and workflow testing; it does not validate the historical BCI findings.
+- Prospective causal effects and a biological mechanism have not been established.
 
-The definition depends on the event markers available in the dataset and must be specified before analysis in prospective studies.
+Do not describe NFOT as a demonstrated breakthrough. Preserve the distinction between observed association, prediction, causal evidence, and proposed mechanism.
 
-## Historical BCI Analysis
+## Repository guide
 
-### Dataset and Processing
+| Path | Purpose |
+|---|---|
+| `manuscript/` | Current v6 working manuscript |
+| `docs/` | Research status, methods, hypotheses, audits, protocols, and evidence ledger |
+| `analysis/` | Analysis and audit scripts |
+| `data/` | Historical derived data, source exports, and prototype trial data |
+| `src/` | Reusable project code, including VampireBCI integration code |
+| `demos/` | Interactive timing demonstration |
+| `formal/` | Lean formalization and verification notes |
+| `tests/` | Automated checks |
+| `research/` | Research source notes |
+| `publications/` | Released manuscript/preprint artifacts |
+| `archive/unreviewed_v7_material/` | V7-labelled working material retained for review; not the canonical manuscript |
 
-The observational analysis used **bigP3BCI Study M data from PhysioNet**.
-
-The analysis pipeline used VampireBCI to extract relevant event markers, including:
-
-- `StimulusBegin`
-- `DisplayResult` (legacy exports may use `DisplayResults`)
-- `CurrentTarget`
-- `SelectedTarget`
-
-Target selection was reconstructed from the recorded row and column events using the dataset's target-grid convention. The reconstruction was checked against 4,192 of 4,192 applicable events.
-
-### Analysis Sample
-
-The NFOT v5 analysis included:
-
-- **444 trials**
-- **15 participants**
-- Participants M_04–M_20, excluding M_08
-
-The primary outcome was trial-level BCI target-selection accuracy.
-
-### Historical v5 Reported Results
-
-The v5 analysis reported the following results:
-
-| Measure | Reported result |
-|---|---:|
-| Trials analyzed | 444 |
-| Participants | 15 |
-| Overall accuracy | 82.9% |
-| Mean Write-Back Gap | 7.06 s |
-| Standard deviation of $L$ | 3.32 s |
-| Within-participant association | $\beta = -0.111$, $p = 0.030$ |
-| Leave-one-subject-out slope direction | Negative in 15/15 folds |
-| AUC, baseline model | 0.656 |
-| AUC, augmented model | 0.731 |
-| AUC difference | +0.076 |
-| Reported 95% CI for AUC difference | [0.021, 0.131] |
-
-These figures are historical reported results. The v6/v7 audits reproduce only descriptive arithmetic from the supplied derived table; they do not independently reproduce the source extraction or inferential outputs. Interpret the values in the context of their model specifications, uncertainty estimates, and observational design.
-
-The leave-one-subject-out result indicates that the estimated association's direction was consistent across the reported folds. It does not establish causation or guarantee generalization to independent datasets.
-
-### Distributional Analysis
-
-The v5 analysis also investigated whether trial-level variability in $L$ was associated with performance beyond mean timing.
-
-The reported results suggested that variability-related measures may contain additional predictive information. This motivates testing distributional features in future work, with their definitions, model specifications, and evaluation procedures fixed in advance.
-
-Predictive improvement in a retrospective dataset does not, by itself, establish a new biological mechanism.
-
-## Interpretation
-
-The historical findings are consistent with the hypothesis that trial-level feedback timing may be informative about BCI performance.
-
-Three distinctions are essential:
-
-1. **Association is not causation.** The observed relationship does not show that manipulating $L$ will change accuracy.
-2. **Prediction is not mechanism.** Better predictive performance does not establish why the association occurs.
-3. **A temporal interval is not automatically a neural variable.** The measured interval includes the events and processing stages between its operational endpoints.
-
-Potential confounds, measurement choices, model assumptions, participant-level dependence, and external validity remain relevant to interpretation.
-
-## Why Controlled Validation Is Necessary
-
-The next stage is a prospective experiment that manipulates feedback timing under a predefined protocol.
-
-A rigorous validation plan should specify:
-
-1. Fixed event definitions, signal processing, and event-detection rules.
-2. Predefined fast-feedback, slow-feedback, and programmed-delay conditions.
-3. Randomized assignment of timing conditions where appropriate.
-4. A prespecified primary outcome and statistical analysis.
-5. Verification of achieved timing rather than reliance only on assigned delays.
-6. Participant-level analysis and transparent handling of missing or invalid trials.
-7. Independent replication before making broad claims.
-
-The experiment should distinguish the assigned delay from the achieved Write-Back Gap and should validate physical display timing if claims depend on actual screen onset.
-
-## Software Prototype
-
-The accompanying interactive prototype is a separate software-development tool. It runs a simple number-parity task with randomized post-response delays, records response and feedback-command timestamps, and exports trial-level CSV data.
-
-It is useful for testing:
-
-- Trial sequencing and randomization.
-- Timestamp bookkeeping.
-- Assigned-versus-achieved delay calculations.
-- CSV export and basic consistency checks.
-
-**The prototype does not independently validate the historical BCI findings.** It does not record EEG, directly measure physical display onset, or establish an effect on learning. Its simple task is a starting point for testing the instrumentation workflow.
+See [docs/INDEX.md](docs/INDEX.md) for the document map and [data/README.md](data/README.md) for data-handling notes.
 
 ## Reproducibility
 
-For reproducible research, future releases should document:
+Install dependencies:
 
-- Dataset version and source.
-- Event extraction and target-reconstruction procedures.
-- Inclusion and exclusion criteria.
-- Exact definitions of timing variables.
-- Model specifications and uncertainty calculations.
-- Software versions and analysis scripts.
-- Deviations from the planned protocol.
+```bash
+python -m pip install -r requirements.txt
+```
 
-Raw data should remain unchanged, and all cleaning and exclusion decisions should be documented. Do not publish sensitive or identifiable participant information.
+Run the test suite:
 
-## Limitations
+```bash
+python -m unittest discover -s tests -p 'test_*.py' -v
+```
 
-The current evidence has important limitations:
+Check the exact event definitions, dataset version, inclusion criteria, timestamp units, target reconstruction, and analysis specification before interpreting any result. Raw source data should remain unchanged; cleaning and exclusion decisions should be documented. Do not commit identifiable or sensitive participant information.
 
-- The historical analysis is observational.
-- The sample is limited to the analyzed dataset and participants.
-- Event markers are operational measurements and may not equal physical display onset.
-- Trial-level observations from the same participant are not independent.
-- Predictive performance may change across tasks, devices, datasets, and populations.
-- Prospective manipulation and independent replication are still needed.
+## Historical preprint
 
-These limitations define the next research steps; they do not make the question unworthy of investigation.
-
-## NFOT v7 documents
-
-The v7 audit and planning set is in `docs/`: `V7_BASELINE_AND_SCOPE.md`, `V7_SOURCE_DATA_AUDIT.md`, `V7_EVIDENCE_LEDGER.md`, `V7_STATISTICAL_ANALYSIS_PLAN.md`, `V7_FORMAL_MODEL.md`, `V7_PROSPECTIVE_PROTOCOL.md`, `V7_PREREGISTRATION_DRAFT.md`, `V7_FALSIFICATION_MATRIX.md`, `V7_BENCHMARK_REPORT.md`, `V7_LITERATURE_REVIEW.md`, `V7_NOVELTY_AND_POSITIONING.md`, `V7_NEUROSCIENCE_MECHANISM_REVIEW.md`, `V7_APPLICATIONS_AND_TRANSLATION.md`, `V7_BREAKTHROUGH_READINESS.md`, and `V7_FINAL_MISSION_REPORT.md`. The manuscript draft is in `manuscript/NFOT_v7_manuscript.md`. Source-level validation remains blocked until the required recordings or trusted event streams are recovered.
-
-## Research Status
-
-| Component | Status |
-|---|---|
-| Write-Back Gap operationalization | Defined for the historical dataset |
-| Historical BCI analysis | Completed for v5 |
-| Trial-level association analysis | Reported |
-| Distributional-feature investigation | Exploratory evidence reported |
-| Interactive timing prototype | Implemented separately |
-| Prospective causal manipulation | Not yet established |
-| Independent replication | Outstanding |
-| Biological mechanism | Not established |
-
-## Conclusion
-
-NFOT investigates whether trial-level feedback timing—and particularly the distribution of the Write-Back Gap—can improve how closed-loop system performance is characterized.
-
-The v5 historical analysis reports an association between the Write-Back Gap and BCI accuracy, along with predictive results that motivate further study. The next scientific milestone is not to assume a breakthrough, but to test whether the reported patterns survive controlled manipulation, stronger measurement validation, and independent replication.
-
-**The central claim remains falsifiable:** if prospectively specified analyses fail to show the predicted relationships under appropriately controlled conditions, the hypothesis must be revised or rejected.
+The v5 preprint is retained in `publications/NFOT_v5_preprint.pdf`. Its claims and reported results must be read alongside the subsequent audit and provenance documentation.
 
 ## Citation
 
-**Neural Feedback Optimization Theory (NFOT), Version 5.** *The Write-Back Gap as a Trial-Level Temporal Variable in Closed-Loop Learning Systems.* F. A. Kassim, 2026.
-
-[Zenodo record](https://zenodo.org/records/23140358)
+See [CITATION.cff](CITATION.cff) and the [Zenodo record](https://zenodo.org/records/23140358).
 
 ---
 
-*This repository documents exploratory independent research. The results are not clinical evidence, and NFOT should not be treated as an established scientific theory without further validation.*
+*This repository documents independent exploratory research. It is not clinical evidence, and NFOT should be treated as a testable research programme pending stronger validation and independent replication.*
