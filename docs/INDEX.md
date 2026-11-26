@@ -22,6 +22,7 @@ This directory contains the active research record for NFOT v6 and its associate
 
 ## Protocols and prospective work
 
+- [PTSP — Phase-Targeted Stimulation Protocol](PTSP_PHASE_TARGETED_STIMULATION_PROTOCOL.md) — official protocol identity, scope, and unresolved phase-targeting specification.
 - [Experiment protocol](EXPERIMENT_PROTOCOL.md)
 - [V6 prospective protocol](V6_PROSPECTIVE_PROTOCOL.md)
 - [PTSP protocol](PTSP_PROTOCOL_2026-11-03.md)
